@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: FundFlow infrastructure for reporting pipeline
+
+Resources:
+  FundFlowDataBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: fundflow-data-bucket
+
+  FundFlowReportingLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  FundFlowReporting:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: FundFlowReporting
+      Runtime: python3.11
+      Handler: index.handler
+      Role: !GetAtt FundFlowReportingLambdaRole.Arn
+      Code:
+        ZipFile: |
+          def handler(event, context):
+              return {
+                  "statusCode": 200,
+                  "body": "FundFlow reporting lambda is running"
+              }
